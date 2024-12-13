@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Patrulha</title>
+    <style text="text/css">
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5e4c3;
+            color: #3b2f26;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            text-shadow: 2px 2px #d4c1a1;
+        }
+
+        form {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: #efe2b2;
+            border-radius: 8px;
+            border: 2px solid #c1a76e;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+
+        input, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #a68a64;
+            border-radius: 4px;
+            background-color: #faf1de;
+            font-family: 'Times New Roman', Times, serif;
+            box-sizing: border-box;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #866b4a;
+            outline: none;
+        }
+
+        button {
+            background-color: #8c6d4a;
+            color: white;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #6f5336;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            font-size: 18px;
+            margin-top: 10px;
+            color: #8c6d4a;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Relatório de Patrulha</h1>
+
+<form id="patrol-form">
+    <label for="title">Título</label>
+    <input type="text" id="title" required>
+
+    <label for="date">Data</label>
+    <input type="date" id="date" required>
+
+    <label for="name">Seu Nome</label>
+    <input type="text" id="name" required>
+
+    <label for="description">Texto</label>
+    <textarea id="description" rows="5" required></textarea>
+
+    <label for="officers">Oficiais Envolvidos</label>
+    <input type="text" id="officers" placeholder="Separe os nomes com vírgulas" required>
+
+    <button type="submit" id="submit-button">Enviar Relatório</button>
+    <div id="loading">Enviando...</div>
+</form>
+
+<script type="text/javascript">
+    document.getElementById('patrol-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const title = document.getElementById('title').value;
+        const date = document.getElementById('date').value;
+        const formattedDate = new Date(date);
+        formattedDate.setFullYear(1899);
+        const dateString = formattedDate.toLocaleDateString();
+
+        const name = document.getElementById('name').value;
+        const description = document.getElementById('description').value;
+        const officers = document.getElementById('officers').value;
+
+        const webhookURL = 'https://discord.com/api/webhooks/1317153907939741746/zcSlmfkzVF23QtssgCwLLLrewFay4OU5RS91p9390sKEq-9UGVxCn1Q9t0sUF5jrsNvp';
+
+        const payload = {
+            username: 'Relatório de Patrulha',
+            embeds: [
+                {
+                    title: title,
+                    description: description,
+                    fields: [
+                        {
+                            name: 'DATA',
+                            value: dateString,
+                        },
+                        {
+                            name: 'RELATOR',
+                            value: name,
+                        },
+                        {
+                            name: 'OFICIAIS ENVOLVIDOS',
+                            value: officers,
+                        }
+                    ],
+                    color: 10914404
+                }
+            ],
+        };
+
+        const submitButton = document.getElementById('submit-button');
+        const loadingIndicator = document.getElementById('loading');
+
+        submitButton.disabled = true;
+        loadingIndicator.style.display = 'block';
+
+        try {
+            const response = await fetch(webhookURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                alert('Relatório foi enviado!');
+            } else {
+                alert('Erro ao enviar o relatório');
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            alert('Ocorreu um erro ao enviar o relatório.');
+        }  finally {
+            submitButton.disabled = false;
+            loadingIndicator.style.display = 'none';
+        }
+    });
+</script>
+
+</body>
+</html>
